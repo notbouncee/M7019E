@@ -1,4 +1,4 @@
-package com.example.labassignment.ui.files.screens
+package com.example.labassignment.ui.files.aesthetics
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

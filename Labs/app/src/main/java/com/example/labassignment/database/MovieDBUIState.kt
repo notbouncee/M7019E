@@ -1,4 +1,7 @@
 package com.example.labassignment.database
 
-class MovieDBUIState {
-}
+import com.example.labassignment.model.Movie
+
+data class MovieDBUIState (
+    val selectedMovie: Movie? = null
+)

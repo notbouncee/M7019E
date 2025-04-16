@@ -1,4 +1,4 @@
-package com.example.labassignment.ui.files.screens
+package com.example.labassignment.ui.files.aesthetics
 
 import androidx.compose.ui.graphics.Color
 
