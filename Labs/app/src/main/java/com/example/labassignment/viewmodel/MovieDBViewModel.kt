@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class MovieDBViewModel : ViewModel() {
+
     private val _uiState = MutableStateFlow(MovieDBUIState())
     val uiState: StateFlow<MovieDBUIState> = _uiState.asStateFlow()
 
@@ -18,3 +19,4 @@ class MovieDBViewModel : ViewModel() {
         }
     }
 }
+
