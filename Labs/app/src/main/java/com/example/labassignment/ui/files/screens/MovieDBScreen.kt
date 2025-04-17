@@ -35,7 +35,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.labassignment.R
-import com.example.labassignment.database.MovieDB
 import com.example.labassignment.ui.files.aesthetics.LabAssignmentTheme
 import com.example.labassignment.viewmodel.MovieDBViewModel
 
@@ -110,7 +109,6 @@ fun TheMovieDBApp(viewModel: MovieDBViewModel = viewModel(),
         ){
             composable(route = MovieDBScreen.List.name){
                 MovieListScreen(
-                    movieList = MovieDB.movies,
                     onMovieListItemClicked = { movie ->
                         viewModel.setSelectedMovie(movie)
                         navController.navigate(MovieDBScreen.Detail.name)
