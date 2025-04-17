@@ -67,7 +67,7 @@ fun MovieListItemCard(
             Box {
                 Spacer(modifier = Modifier.size(20.dp))
                 AsyncImage(
-                    model = Constants.POSTER_IMAGE_BASE_URL + Constants.POSTER_IMAGE_WIDTH + movie.posterPath,
+                    model = Constants.POSTER_IMAGE_BASE_URL + Constants.POSTER_IMAGE_WIDTH + movie.poster_path,
                     contentDescription = movie.title,
                     modifier = modifier.width(92.dp).height(138.dp),
                     contentScale = ContentScale.Crop
@@ -81,7 +81,7 @@ fun MovieListItemCard(
                 )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
-                    text = movie.releaseDate,
+                    text = movie.release_date,
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Spacer(modifier = Modifier.size(8.dp))
@@ -92,6 +92,10 @@ fun MovieListItemCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = movie.genres.joinToString { it.name },
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }

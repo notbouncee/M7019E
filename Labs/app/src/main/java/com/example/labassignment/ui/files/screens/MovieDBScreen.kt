@@ -5,7 +5,10 @@ package com.example.labassignment.ui.files.screens
 
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,6 +23,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,8 +35,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.labassignment.R
-import com.example.labassignment.database.Movies
-import com.example.labassignment.model.Movie
+import com.example.labassignment.database.MovieDB
 import com.example.labassignment.ui.files.aesthetics.LabAssignmentTheme
 import com.example.labassignment.viewmodel.MovieDBViewModel
 
@@ -50,11 +53,23 @@ fun MovieDBAppBar(
     modifier: Modifier = Modifier
 ){
     TopAppBar(
-        title = {Text(stringResource(currScreen.title))},
+        title = {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(top = 2.dp), // push closer to top
+                contentAlignment = Alignment.TopStart
+            ) {
+                Text(
+                    text = stringResource(currScreen.title),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+        },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        modifier = modifier,
+        modifier = modifier.height(64.dp),
         navigationIcon = {
             if (canNavigateBack){
                 IconButton(onClick = navigateUp) {
@@ -95,7 +110,7 @@ fun TheMovieDBApp(viewModel: MovieDBViewModel = viewModel(),
         ){
             composable(route = MovieDBScreen.List.name){
                 MovieListScreen(
-                    movieList = Movies().getMovies(),
+                    movieList = MovieDB.movies,
                     onMovieListItemClicked = { movie ->
                         viewModel.setSelectedMovie(movie)
                         navController.navigate(MovieDBScreen.Detail.name)
@@ -117,15 +132,6 @@ fun TheMovieDBApp(viewModel: MovieDBViewModel = viewModel(),
 @Composable
 fun GreetingPreview() {
     LabAssignmentTheme {
-        MovieListItemCard(
-            movie = Movie(
-                2,
-                "In the Lost Lands",
-                "/iHf6bXPghWB6gT8kFkL1zo00x6X.jpg",
-                "/op3qmNhvwEvyT7UFyPbIfQmKriB.jpg",
-                "2025-02-27",
-                "A queen sends the powerful and feared sorceress Gray Alys to the ghostly wilderness of the Lost Lands in search of a magical power, where the sorceress and her guide, the drifter Boyce must outwit and outfight man and demon."
-            ), {}
-        )
+        TheMovieDBApp()
     }
 }
