@@ -1,6 +1,11 @@
-# M7019E
+# M7019E Mobile Applications
 
 Taken at Luleå University of Technology 🇸🇪 and mapped to IM3180 Design and Innovation Project 🇸🇬
+
+# Topics
+
+ • Kotlin
+ • Android Studio
 
 ## Lab 1
 
