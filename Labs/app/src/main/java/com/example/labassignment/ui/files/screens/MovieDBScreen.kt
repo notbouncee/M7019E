@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,8 @@ import kotlinx.coroutines.launch
 import com.example.labassignment.model.Movie
 import com.example.labassignment.model.Genre
 import com.example.labassignment.utils.Constants
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.labassignment.viewmodel.MovieDBViewModel
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -42,7 +45,7 @@ enum class MovieDBScreen(@StringRes val title: Int){
 }
 
 @Composable
-fun TheMovieDBApp() {
+fun TheMovieDBApp(viewModel: MovieDBViewModel = viewModel()) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
     var popularMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
@@ -57,22 +60,21 @@ fun TheMovieDBApp() {
 
     NavHost(
         navController = navController,
-        startDestination = "movie_list",
+        startDestination = MovieDBScreen.List.name,
         modifier = Modifier.fillMaxSize()
     ) {
-        composable("movie_list") {
+        composable(MovieDBScreen.List.name) {
             MovieListScreen(
                 popularMovies = popularMovies,
                 topRatedMovies = topRatedMovies,
                 onMovieClick = { movie ->
-                    navController.navigate("movie_detail/${movie.id}")
+                    viewModel.setSelectedMovie(movie)  //  ViewModel handles selection
+                    navController.navigate(MovieDBScreen.Detail.name)
                 }
             )
         }
-        composable("movie_detail/{movieId}") { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
-            val allMovies = popularMovies + topRatedMovies
-            val movie = allMovies.find { it.id == movieId }
+        composable(MovieDBScreen.Detail.name) {
+            val movie = viewModel.uiState.collectAsState().value.selectedMovie
             if (movie != null) {
                 MovieDetailScreen(
                     movie = movie,
