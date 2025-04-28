@@ -6,6 +6,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class TabItem(val title: String, val icon: ImageVector) {
-    object Home : TabItem("Home", Icons.Default.Home)
-    object Search : TabItem("Search", Icons.Default.Search)
+    data object Home : TabItem("Home", Icons.Default.Home)
+    data object Search : TabItem("Search", Icons.Default.Search)
 }
