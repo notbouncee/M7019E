@@ -4,8 +4,8 @@ Taken at Luleå University of Technology 🇸🇪 and mapped to IM3180 Design an
 
 # Topics
 
- • Kotlin
- • Android Studio
+ - Kotlin
+ - Android Studio
 
 ## Lab 1
 
@@ -45,3 +45,9 @@ Taken at Luleå University of Technology 🇸🇪 and mapped to IM3180 Design an
     - Show how to cache data into the room database so that the list and MovieDetail can still work when there is no internet connection
     - Show the ability to load data automatically when the internet connection is back on. 
     - Show the ability to have background tasks
+
+- Things added to app
+
+    - Favourites Tab to display favourited movies in a Grid layout
+    - Room functionality for caching of data 
+    - Connectivity Manager for when connection is lost or regained 
