@@ -65,6 +65,9 @@ dependencies {
     // Converter for JSON to Kotlin data classes (Gson)
     implementation(libs.converter.gson)
 
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+    
 
     // Room
     implementation(libs.androidx.room.ktx)

@@ -6,21 +6,22 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
+import com.example.bingchilling.database.AppDatabase
 import com.example.bingchilling.viewmodel.MovieDBViewModel
 
 sealed class TabItem(val title: String,
                      val icon: ImageVector,
-                     val screen: @Composable () -> Unit) {
-    object Home : TabItem("Home", Icons.Default.Home, { TheMovieDBApp() })
-    data object Favourites : TabItem("Favourites", Icons.Default.Favorite, {
-        val navController = rememberNavController()
-        val viewModel: MovieDBViewModel = viewModel()
+                     val screen: @Composable (NavController, MovieDBViewModel, AppDatabase, Boolean) -> Unit) {
+    data object Home : TabItem("Home", Icons.Default.Home, { _, viewModel, _, _ ->
+        TheMovieDBApp(viewModel = viewModel)
+    })
 
-        FavoriteMoviesTab(onMovieClick = { movie ->
-            viewModel.setSelectedMovie(movie)
-            navController.navigate(MovieDBScreen.Detail.name)
-        })
+    data object Favourites : TabItem("Favourites", Icons.Default.Favorite, { _, viewModel, db, isConnected ->
+        FavoriteMoviesTab(
+            viewModel = viewModel,
+            isConnected = isConnected,
+            db = db
+        )
     })
 }
