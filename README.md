@@ -51,3 +51,5 @@ Taken at Luleå University of Technology 🇸🇪 and mapped to IM3180 Design an
     - Favourites Tab to display favourited movies in a Grid layout
     - Room functionality for caching of data 
     - Connectivity Manager for when connection is lost or regained 
+    - Added some screen rotation adaptability
+    - Added another NavHost in FavouritesTab to fix crashing when selecting movie in Favourites list
