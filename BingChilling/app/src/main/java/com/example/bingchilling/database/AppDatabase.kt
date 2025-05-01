@@ -7,10 +7,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 
-@Database(entities = [MovieEntity::class], version = 1, exportSchema = false)
+@Database(entities = [MovieEntity::class, CachedMovieEntity::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDAO
+    abstract fun cachedMovieDAO(): CachedMovieDAO
 
 
     companion object {
@@ -22,8 +23,10 @@ abstract class AppDatabase : RoomDatabase() {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "CouchPotatoDB"
-                ).build().also { INSTANCE = it }
+                    "BingChillingDB"
+                )
+                    .fallbackToDestructiveMigration(true)
+                    .build().also { INSTANCE = it }
             }
         }
     }

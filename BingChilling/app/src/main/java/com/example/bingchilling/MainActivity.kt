@@ -17,12 +17,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.bingchilling.ui.theme.BingChillingTheme
 import com.example.bingchilling.screens.TabItem
+import com.example.bingchilling.workmanager.MovieSyncWorker
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val syncRequest = PeriodicWorkRequestBuilder<MovieSyncWorker>(6, TimeUnit.HOURS).build()
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            "MovieSync",
+            ExistingPeriodicWorkPolicy.KEEP,
+            syncRequest
+        )
         enableEdgeToEdge()
         setContent {
             BingChillingTheme {
@@ -42,6 +53,8 @@ fun MainScreen() {
     val tabs = listOf(TabItem.Home, TabItem.Favourites)
     var selectedTab by remember { mutableStateOf<TabItem>(TabItem.Home) }
 
+
+
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -57,7 +70,7 @@ fun MainScreen() {
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            selectedTab.screen()
+            selectedTab.screen(navController, viewModel, db, isConnected)  // Passing shared dependencies
         }
     }
 }

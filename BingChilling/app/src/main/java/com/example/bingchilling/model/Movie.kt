@@ -1,6 +1,7 @@
 package com.example.bingchilling.model
 
 
+import com.example.bingchilling.database.CachedMovieEntity
 import com.example.bingchilling.database.MovieEntity
 import com.google.gson.annotations.SerializedName
 
@@ -131,6 +132,39 @@ data class NetworkMovie(
     val genreIds: List<Int>   // Only IDs here
 )
 
+fun Movie.toCachedEntity(): CachedMovieEntity = CachedMovieEntity(
+    id,
+    adult,
+    backdrop_path,
+    genres,
+    original_language,
+    original_title,
+    overview,
+    popularity,
+    poster_path,
+    release_date,
+    title,
+    video,
+    vote_average,
+    vote_count
+)
+
+fun CachedMovieEntity.toMovie(): Movie = Movie(
+    adult,
+    backdrop_path,
+    genres,
+    id,
+    original_language,
+    original_title,
+    overview,
+    popularity,
+    poster_path,
+    release_date,
+    title,
+    video,
+    vote_average,
+    vote_count
+)
 
 
 val genreMap = mapOf(
