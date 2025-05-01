@@ -1,6 +1,7 @@
 package com.example.bingchilling.screens
 
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.bingchilling.model.Movie
@@ -40,6 +42,11 @@ fun MovieListScreen(
     selectedView: String,
     onViewTypeChange: (String) -> Unit,
     isConnected: Boolean) {
+
+    val configuration = LocalConfiguration.current
+    val cols = if (configuration.orientation ==
+        Configuration.ORIENTATION_LANDSCAPE) 4 else 2
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -102,7 +109,7 @@ fun MovieListScreen(
         )
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(cols),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize()
