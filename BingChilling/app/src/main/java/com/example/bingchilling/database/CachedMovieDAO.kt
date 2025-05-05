@@ -14,6 +14,6 @@ interface CachedMovieDAO {
     @Query("DELETE FROM Cached")
     suspend fun clearAll()
 
-    @Query("SELECT * FROM Cached")
-    fun getCachedMovies(): Flow<List<CachedMovieEntity>>
+    @Query("SELECT * FROM Cached WHERE viewType = :viewType")
+    fun getByViewType(viewType: String): Flow<List<CachedMovieEntity>>
 }

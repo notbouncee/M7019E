@@ -132,7 +132,7 @@ data class NetworkMovie(
     val genreIds: List<Int>   // Only IDs here
 )
 
-fun Movie.toCachedEntity(): CachedMovieEntity = CachedMovieEntity(
+fun Movie.toCachedEntity(viewType: String): CachedMovieEntity = CachedMovieEntity(
     id,
     adult,
     backdrop_path,
@@ -146,7 +146,8 @@ fun Movie.toCachedEntity(): CachedMovieEntity = CachedMovieEntity(
     title,
     video,
     vote_average,
-    vote_count
+    vote_count,
+    viewType = viewType
 )
 
 fun CachedMovieEntity.toMovie(): Movie = Movie(

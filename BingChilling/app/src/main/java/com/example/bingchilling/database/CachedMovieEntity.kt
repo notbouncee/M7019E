@@ -19,5 +19,6 @@ data class CachedMovieEntity(
     val title: String,
     val video: Boolean,
     val vote_average: Double,
-    val vote_count: Int
+    val vote_count: Int,
+    val viewType: String      // either "popular" or "top_rated"
 )

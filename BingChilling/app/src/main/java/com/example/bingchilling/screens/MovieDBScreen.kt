@@ -26,12 +26,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.bingchilling.R
 import com.example.bingchilling.ui.theme.BingChillingTheme
-import com.example.bingchilling.model.Movie
-import com.example.bingchilling.utils.Constants
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bingchilling.database.AppDatabase
 import com.example.bingchilling.model.toMovie
-import com.example.bingchilling.network.RetrofitInstance
 import com.example.bingchilling.viewmodel.MovieDBViewModel
 import com.example.bingchilling.utils.isNetworkConnected
 import androidx.compose.runtime.DisposableEffect
@@ -40,8 +37,11 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-
-
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.example.bingchilling.workmanager.MovieSyncWorker
 
 
 enum class MovieDBScreen(@StringRes val title: Int){
@@ -52,12 +52,19 @@ enum class MovieDBScreen(@StringRes val title: Int){
 @Composable
 fun TheMovieDBApp(viewModel: MovieDBViewModel = viewModel()) {
     val navController = rememberNavController()
-    val context = LocalContext.current
-    val db = remember { AppDatabase.getDatabase(context) }
+    // Context + WorkManager + Room
+    val context       = LocalContext.current
+    val workManager   = WorkManager.getInstance(context)
+    val db            = remember { AppDatabase.getDatabase(context) }
+
+    // Network connectivity
     var isConnected by remember { mutableStateOf(isNetworkConnected(context)) }
-    var viewType by remember { mutableStateOf("Popular Movies") } // default
-    var cachedViewType by remember { mutableStateOf("Popular Movies") } // default
-    var cachedMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
+
+    // Selected view-state: use the Worker constants directly
+    var viewType by remember { mutableStateOf(MovieSyncWorker.VIEW_POPULAR) }
+
+//    var cachedViewType by remember { mutableStateOf("Popular Movies") } // default
+//    var cachedMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
 
 
 
@@ -77,28 +84,29 @@ fun TheMovieDBApp(viewModel: MovieDBViewModel = viewModel()) {
 
     // Fetch Movies
     LaunchedEffect(viewType, isConnected) {
-        if (viewType != cachedViewType) {
-            cachedMovies = emptyList()
-            cachedViewType = viewType
-        }
+        if (isConnected) {
+            val inputData = workDataOf(
+                MovieSyncWorker.KEY_VIEW_STATE to viewType
+            )
+            val workReq = OneTimeWorkRequestBuilder<MovieSyncWorker>()
+                .setInputData(inputData)
+                .build()
 
-        when (viewType) {
-            "Popular Movies" -> {
-                if (isConnected && cachedMovies.isEmpty()) {
-                    val response = RetrofitInstance.api.getPopularMovies(Constants.API_KEY)
-                    cachedMovies = response.results.map { it.toMovie() }
-                    Log.d("MovieDBApp", "Loaded Popular Movies with ${cachedMovies.size} movies")
-                }
-            }
-            "Top Rated Movies" -> {
-                if (isConnected && cachedMovies.isEmpty()) {
-                    val response = RetrofitInstance.api.getTopRatedMovies(Constants.API_KEY)
-                    cachedMovies = response.results.map { it.toMovie() }
-                    Log.d("MovieDBApp", "Loaded Top Rated Movies with ${cachedMovies.size} movies")
-                }
-            }
+            workManager.enqueueUniqueWork(
+                /* uniqueName = */ "sync_movies",
+                /* policy     = */ ExistingWorkPolicy.REPLACE,
+                /* work       = */ workReq
+            )
         }
     }
+
+    // Collect the cached movies for the current viewType from Room
+    val cachedEntities by db.cachedMovieDAO()
+        .getByViewType(viewType)
+        .collectAsState(initial = emptyList())
+
+    // Map entities back to your domain model
+    val movies = cachedEntities.map { it.toMovie() }
 
     NavHost(
         navController = navController,
@@ -107,10 +115,18 @@ fun TheMovieDBApp(viewModel: MovieDBViewModel = viewModel()) {
     ) {
         composable(MovieDBScreen.List.name) {
             MovieListScreen(
-                popularMovies = if (viewType == "Popular Movies") cachedMovies else emptyList(),
-                topRatedMovies = if (viewType == "Top Rated Movies") cachedMovies else emptyList(),
-                selectedView = viewType,
-                onViewTypeChange = { viewType = it },
+                popularMovies   = if (viewType == MovieSyncWorker.VIEW_POPULAR) movies else emptyList(),
+                topRatedMovies  = if (viewType == MovieSyncWorker.VIEW_TOP_RATED) movies else emptyList(),
+                selectedView    = if (viewType == MovieSyncWorker.VIEW_POPULAR)
+                    "Popular Movies"
+                else
+                    "Top Rated Movies",
+                onViewTypeChange = { newLabel ->
+                    viewType = if (newLabel == "Top Rated Movies")
+                        MovieSyncWorker.VIEW_TOP_RATED
+                    else
+                        MovieSyncWorker.VIEW_POPULAR
+                },
                 isConnected = isConnected,
                 onMovieClick = { movie ->
                     viewModel.setSelectedMovie(movie)  //  viewModel handles selection
